@@ -90,6 +90,56 @@ namespace AccesoDatos
             }
         }
 
+        public List<T>? ReaderList<T>(string query, SqlParameter[]? parameters = null) where T : new()
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.CommandType = CommandType.Text;
+
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        connection.Open();
+
+                        using (SqlDataReader dataReader = command.ExecuteReader())
+                        {
+                            List<T> lista = new List<T>();
+
+                            while (dataReader.Read())
+                            {
+                                T resultType = new ();
+
+                                for (int i = 0; i < dataReader.FieldCount; i++)
+                                {
+                                    string nombreColumna = dataReader.GetName(i);
+                                    
+                                    PropertyInfo propiedad = typeof(T).GetProperty(nombreColumna);
+                                    if (propiedad != null && !dataReader.IsDBNull(i))
+                                    {
+                                        object valor = dataReader.GetValue(i);
+                                        propiedad.SetValue(resultType, valor);
+                                    }
+                                }
+
+                                lista.Add(resultType);
+                            }
+                            return lista;
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new Exception(exception.Message);
+            }
+        }
+
     }
 }
 
