@@ -9,6 +9,6 @@ namespace LogicaNegocios.Entidades
     internal class FormaPago
     {
         public int Id { get; set; }
-        public string FormaPago { get; set;}
+        public string TipoPago { get; set;}
     }
 }
