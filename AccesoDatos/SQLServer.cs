@@ -140,6 +140,32 @@ namespace AccesoDatos
             }
         }
 
+        public T Scalar<T>(string query, SqlParameter[]? parameters = null)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.CommandType = CommandType.Text;
+
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        connection.Open();
+                        
+                        return (T)command.ExecuteScalar();
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new Exception(exception.Message);
+            }
+        }
     }
 }
 
